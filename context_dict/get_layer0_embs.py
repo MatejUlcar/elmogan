@@ -1,31 +1,21 @@
 from allennlp.commands.elmo import ElmoEmbedder
 import numpy as np
-#from scipy import spatial
-#import time
-#from math import floor
-#import heapq
 import argparse
 import random
-#from annoy import AnnoyIndex
 
-#options_file = "path/to/elmo_model/options.json"
-#weight_file = "path/to/elmo_model/gigafida_weights.hdf5"
-#options_file = "../elmo_model/29_apr/options.json"
-#weight_file = "../elmo_model/gigafida_weights.hdf5"
+
 parser = argparse.ArgumentParser()
-parser.add_argument('-w1', '--weights1', required=True, help="Path to elmo weights file (.hdf5)")
-parser.add_argument('-o1', '--options1', required=True, help="Path to elmo options file (.json)")
-parser.add_argument('-w2', '--weights2', required=True, help="Path to elmo weights file (.hdf5)")
-parser.add_argument('-o2', '--options2', required=True, help="Path to elmo options file (.json)")
+parser.add_argument('-w1', '--weights1', required=True, help="Path to language1 elmo weights file (.hdf5)")
+parser.add_argument('-o1', '--options1', required=True, help="Path to language1 elmo options file (.json)")
+parser.add_argument('-w2', '--weights2', required=True, help="Path to language2 elmo weights file (.hdf5)")
+parser.add_argument('-o2', '--options2', required=True, help="Path to language2 elmo options file (.json)")
 parser.add_argument('-d', '--dictionary', required=True, help="Path to dictionary file (one pair per line).")
-#parser.add_argument('--side', choices=['left', 'right'], help="Pick left or right side of dictionary.")
 parser.add_argument('-e', '--output', required=True, help="Output folder of embeddings.")
-parser.add_argument('-l1', '--language1')
-parser.add_argument('-l2', '--language2')
+parser.add_argument('-l1', '--language1', help="Your custom language1 identifier.")
+parser.add_argument('-l2', '--language2', help="Your custom language1 identifier.")
 args = parser.parse_args()
 
 
-#csd = spatial.distance.cosine
 def write_embs(output, embs):
     with open(output, 'w') as outfile:
         buffer = str(len(embs))+" 1024\n"
@@ -40,7 +30,6 @@ def write_embs(output, embs):
         outfile.write(buffer)
 
 
-#vocab = []
 embs = {}
 def load_dictionary(args):
     with open(args.dictionary, 'r') as tsvdict:
@@ -70,8 +59,6 @@ def calc_embs(vocab, elmo):
             for w in range(len(batchvectors[s][0])):
                 embs[batchtokens[s][w]] = batchvectors[s][0][w]
                 embcounter += 1
-                #if embcounter%5000 == 0:
-                #    print(embcounter, '/', len(vocab))
     print(len(embs))
     print(embcounter)
     return embs
