@@ -11,7 +11,7 @@ from sklearn.metrics import pairwise
 from scipy.spatial import distance
 from sklearn.preprocessing import normalize
 
-# NEAR-COPY OF ABSent MODEL (Fu et al., 2020)
+# Based upon ABSent MODEL (Fu et al., 2020)
 parser = argparse.ArgumentParser()
 parser.add_argument('--lang1', required=True, type=str, help='L1 embeddings')
 parser.add_argument('--lang2', required=True, type=str, help='L2 embeddings')
@@ -92,8 +92,7 @@ for entry in dictionary:
         x_tr.append(emb1[entry[0]])
         y_tr.append(emb2[entry[1]])
         dictionary_tr.append((entry[0],entry[1]))
-    #if len(entry[1]) < 4 and entry[1] in emb2:
-    #    y_short.append(emb2[entry[1]])
+
         
 dictionary_pr = []
 for entry in dictionary_ev:
@@ -220,7 +219,7 @@ if args.predict:
     losslog = args.predict+'.loss.log'
 else:
     losslog = 'loss.log'
-#model.compile(optimizer=adam, loss="cosine_proximity", metrics=[metrics.mse, metrics.cosine_proximity])
+
 real = np.ones(args.bs)*1.00
 fake = np.ones(args.bs)*0.00
 num_examples = len(y_tr)
@@ -234,14 +233,12 @@ with open(losslog, 'w') as losswriter:
     curr = 0
     for it in range(iters):
         # train discriminator
-        #curr = (it%args.epoch)*args.bs
         curr += args.bs
         if curr >= num_examples:
             curr = 0
         batchsize = min(args.bs, num_examples-curr)
         d_valid_loss1 = discriminator_valid.train_on_batch([x_tr[curr:curr+args.bs],y_tr[curr:curr+args.bs]], real[:batchsize])
-        #x_fake = np.random.uniform(-1, 1, (batchsize//2,emb1_dim))
-        #y_fake = generator.predict(x_fake)
+
         Gx, Gy = generator.predict([x_tr[curr:curr+args.bs], y_tr[curr:curr+args.bs]])
         x_rand = x_tr[np.random.randint(0, x_tr.shape[0], batchsize)]
         y_rand = y_tr[np.random.randint(0, y_tr.shape[0], batchsize)]
@@ -274,9 +271,6 @@ with open(losslog, 'w') as losswriter:
 
 # CALC PREDICTIONS
 y_pr, x_pr = generator.predict([x_ev,y_ev], batch_size=128)
-#y_tr_pr = generator.predict(np.asarray(x_tr), batch_size=128)
-#print(np.shape(y_pr))
-#print(np.shape(y_tr_pr))
 
 # DICTIONARY INDUCTION PREDICTIONS
 def write_predictions(filename, x_predicted, y_predicted, dict_predict):
@@ -313,19 +307,8 @@ if args.output:
 
 if args.predict:
     write_predictions(args.predict, x_pr, y_pr, dictionary_pr)
-    #write_predictions(args.predict+'.ontrain', x_tr, y_tr_pr, dictionary_tr)
 
 x_tr = None
 x_ev = None
 y_tr = None
 y_ev = None
-
-    #l1vectors = np.array(list(emb1.values()))
-    #l1keys = list(emb1.keys())
-    #emb1 = None
-    #y_predict = model.predict(np.array(l1vectors), batch_size=128)
-    #with open(args.output, 'w') as writer:
-    #    writer.write(header.strip()+'\n')
-    #    for word in zip(l1keys, y_predict):
-    #        writer.write(word[0]+' '+' '.join([str(j) for j in word[1]])+'\n')
-
