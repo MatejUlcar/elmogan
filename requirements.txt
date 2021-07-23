@@ -1,0 +1,7 @@
+allennlp==0.9.0
+stanza
+numpy
+sklearn
+scipy
+keras
+tensorflow
